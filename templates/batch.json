@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "batch_id": "series",
+  "mode": "knowledge-card",
+  "items": ["01"],
+  "latest_runs": {"01": null},
+  "sample_items": [],
+  "approvals": {"plan": null, "samples": null}
+}

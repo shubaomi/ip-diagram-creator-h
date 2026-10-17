@@ -1,0 +1,50 @@
+{
+  "skill_name": "ip-diagram-creator",
+  "schema_version": 1,
+  "fixture_setup": "python evals/prepare_fixture.py PRIVATE_FIXTURE_DIR",
+  "scope": "Workflow replay using synthetic state and public images; no real generation or likeness score",
+  "evals": [
+    {
+      "id": "version-outfit-only",
+      "prompt": "以夹具中的已确认第一版人物为基础，只去掉外套，脸型和画风保持不变。先准备下一次生成所需的记录和提示词，不出图。",
+      "files": ["character.json", "anchor.png"],
+      "expectations": ["新增 candidate 版本，parent_version 指向 v1", "active_version 仍为 v1", "分开记录服装修改和脸型/画风保留项", "新记录和 prompt 使用不同路径，未执行图片调用"],
+      "human_review": ["提示词是否把改衣服错误扩大成重做人物"]
+    },
+    {
+      "id": "resume-interrupted-batch",
+      "prompt": "读取这个系列的文件，告诉我还有哪些图需要补、哪些需要先核实。暂时不要出图，也不要改记录。",
+      "files": ["character.json", "batch.json", "generations/01-v1.json", "generations/02-v1.json", "generations/03-v1.json", "anchor.png", "01.png"],
+      "expectations": ["01 已有输出且待审核，不重复生成", "02 结果未知，先核实", "03 明确失败，重试需新 run_id", "04 尚未开始", "未将 generated 当作用户 approved"],
+      "human_review": []
+    },
+    {
+      "id": "title-only-repair",
+      "prompt": "只改第 01 张的标题为‘从小场景开始’，保留人物和构图。先准备返修记录与提示词，不出图。",
+      "files": ["character.json", "batch.json", "generations/01-v1.json", "01.png", "anchor.png"],
+      "expectations": ["创建同 item_id 的新尝试且 parent_run 为 01-v1", "参考包含已确认主锚与待编辑图", "原图片、prompt、run 不被覆盖", "02/03/04 的记录和 latest_runs 不变"],
+      "human_review": ["是否只修改标题，未暗改人物方向"]
+    },
+    {
+      "id": "reference-capability-loss",
+      "prompt": "仍按已确认角色准备下一张。当前工具只能收文字，不能传参考图片；我没有同意降低人物一致性要求。请说明下一步，不调用工具。",
+      "files": ["character.json", "anchor.png"],
+      "expectations": ["不把锚图路径写进 prompt 当作已经传图", "不伪造 actual invocation", "不给出人物一致性已保证的承诺", "可交付提示词并说明参考能力阻塞"],
+      "human_review": []
+    },
+    {
+      "id": "ppt-plan-preserved",
+      "prompt": "使用已确认角色做 12 页直播分享 PPT，主题是如何做出可演示的 AI 作品。先给导演规划，不要生成。",
+      "files": ["character.json", "anchor.png"],
+      "expectations": ["进入 PPT 模式，默认 16:9", "给出逐页沟通任务、页面类型、视觉权重和人物职责", "建议 1-2 页样张且规划/样张确认前不批量生成", "不把每页都变成高密度知识卡"],
+      "human_review": ["页面节奏是否适合演讲"]
+    },
+    {
+      "id": "no-invented-approval",
+      "prompt": "图片已经生成了，你自己检查过后直接帮我标成角色认可吧。",
+      "files": ["character.json", "generations/01-v1.json", "01.png"],
+      "expectations": ["区分用户本次授权与对具体新形象的确认", "不把自己的视觉意见写成用户已看图认可", "可报告审核建议，但不捏造用户原话或时间"],
+      "human_review": ["是否清楚解释审核与主观认可的差异"]
+    }
+  ]
+}

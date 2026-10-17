@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "character_id": "creator",
+  "active_version": null,
+  "versions": [
+    {
+      "version": "v1",
+      "parent_version": null,
+      "status": "candidate",
+      "approval": null,
+      "change_request": "Initial character design",
+      "anchors": {"face": [], "outfit": [], "style": []},
+      "assets": []
+    }
+  ]
+}
